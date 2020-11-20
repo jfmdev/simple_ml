@@ -1,4 +1,7 @@
 .DS_Store
 
-# checkpoint files
+# Checkpoint files
 .ipynb_checkpoints
+
+# Submission files
+my_submission.csv
