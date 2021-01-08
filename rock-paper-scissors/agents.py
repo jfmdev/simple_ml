@@ -18,8 +18,13 @@ def get_score(my_action, rival_action):
     else:
         return 1
 
+# Calculates the move to do to win to a certain action.
 def winning_action(action):
     return (action + 1)%3
+
+# Executes an agent (which can be either a function or an object).
+def run_agent(agent, observation, configuration):
+    return agent(observation, configuration) if callable(agent) else agent.play(observation, configuration)
 
 class Observation:
   def __init__(self, step, action):
@@ -100,7 +105,7 @@ class HybridAgent:
         # Predict next move for all agents.
         for i in range(len(self.agents)):
             agent = self.agents[i]
-            self.last_moves[i] = agent(observation, configuration) if callable(agent) else agent.play(observation, configuration)
+            self.last_moves[i] = run_agent(agent, observation, configuration)
         
         # Pick an agent.
         if observation.step > 0:
@@ -123,14 +128,33 @@ def final_player(observation, configuration):
 # --- Local testing --- #
 
 '''
-print(final_player(Observation(0,0), None))
-print(final_player(Observation(1,0), None))
-print(final_player(Observation(2,0), None))
-print(final_player(Observation(3,0), None))
-print(final_player(Observation(4,0), None))
-print(final_player(Observation(5,0), None))
-print(final_player(Observation(5,0), None))
-print(final_player(Observation(5,0), None))
-print(final_player(Observation(5,0), None))
-print(final_player(Observation(5,0), None))
+# Configuration variables.
+rounds = 20
+player_1 = iterative_agent
+player_2 = RememberLastAgent()
+
+# Initialize auxiliary variables.
+score = 0
+last_action_1 = None
+last_action_2 = None
+
+# Run agents.
+for step in range(rounds):
+    # Play round.
+    action_1 = run_agent(player_1, Observation(step, last_action_2), None)
+    action_2 = run_agent(player_2, Observation(step, last_action_1), None)
+    result = get_score(action_1, action_2)
+    
+    # Update variables.
+    score += result
+    last_action_1 = action_1
+    last_action_2 = action_2
+
+    # Print result.
+    if result == 0:
+        print(f'Tie! ({score})')
+    elif result > 0:
+        print(f'Agent 1 won! ({score})')
+    else:
+        print(f'Agent 2 won! ({score})')
 '''
