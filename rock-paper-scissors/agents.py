@@ -5,9 +5,11 @@ competition from Kaggle (https://www.kaggle.com/c/rock-paper-scissors).
 
 import random
 
+# --- Utilities --- #
+
 # Given two actions, returns a number indicating which won.
-def score(my_action, opponent_action):
-    diff = my_action - opponent_action
+def get_score(my_action, rival_action):
+    diff = my_action - rival_action
     
     if diff == 0:
         return 0
@@ -15,6 +17,14 @@ def score(my_action, opponent_action):
         return -1
     else:
         return 1
+
+def winning_action(action):
+    return (action + 1)%3
+
+class Observation:
+  def __init__(self, step, action):
+    self.step = step
+    self.lastOpponentAction = action
 
 # --- Stateless agents --- #
 
@@ -35,63 +45,92 @@ def copy_opponent_agent(observation, configuration):
 
 # --- Stateful agents --- #
 
-# TODO
+class RememberLastAgent:
+    def __init__(self):
+        self.rival_penultimate = None
+        self.my_penultimate = None
+        self.my_last = None
+        self.predictions = [None]*9
 
-# --- Final agent --- #
+    def play(self, observation, configuration):
+        # Update prediction map.
+        if observation.step > 1:
+            pred_index = self.my_penultimate*3 + self.rival_penultimate
+            self.predictions[pred_index] = observation.lastOpponentAction
 
-agents = [
-    random_agent,
-    iterative_agent,
-    copy_opponent_agent
-]
-
-scores = [0]*len(agents)
-
-last_moves = [0]*len(agents)
-
-
-# Combines all previous agents, using the more succesful.
-def hybrid_agent(observation, configuration):
-    print('----')
+        # Update flags and predict next move.
+        if observation.step > 0:
+            self.rival_penultimate = observation.lastOpponentAction
+            self.my_penultimate = self.my_last
     
-    # Update agents scores.
-    if observation.step > 0:
-        for i in range(len(last_moves)):
-            last_result = score(last_moves[i], observation.lastOpponentAction)
-            scores[i] += last_result
-            print(str(i) + ' - ' + str(scores[i]))
+            pred_index = self.my_last * 3 + observation.lastOpponentAction
+            if self.predictions[pred_index] != None:
+                self.my_last = winning_action(self.predictions[pred_index])
+            else:
+                self.my_last = None
 
-    # Predict next move for all agents.
-    for i in range(len(agents)):
-        agent = agents[i]
-        last_moves[i] = agent(observation, configuration)
-        print(str(i) + ' = ' + str(last_moves[i]))
+        # If can't predict, use the good old random (nothing beats that).
+        if self.my_last == None:
+            self.my_last = random_agent(observation, configuration)
+            
+        return self.my_last    
+
+# --- Hybrid agent --- #
+
+# Combines all previous agents, using the more succesful on each case.
+class HybridAgent:
+    def __init__(self):
+        self.agents = [
+            random_agent,
+            iterative_agent,
+            copy_opponent_agent,
+            RememberLastAgent()
+        ]
+        self.scores = [0]*len(self.agents)
+        self.last_moves = [0]*len(self.agents)
+
+
+    def play(self, observation, configuration):
+        # Update agents scores.
+        if observation.step > 0:
+            for i in range(len(self.last_moves)):
+                last_result = get_score(self.last_moves[i], observation.lastOpponentAction)
+                self.scores[i] += last_result
     
-    # Pick an agent.
-    if observation.step > 0:
-        # Select the most successful agent.
-        best_agent_index = scores.index(min(scores))
-        print('best agent:' + str(best_agent_index))
-        next_move = last_moves[best_agent_index]
-    else:
-        # The first time just use the random agent.
-        next_move = last_moves[0]
-    
-    # Play.
-    return next_move
+        # Predict next move for all agents.
+        for i in range(len(self.agents)):
+            agent = self.agents[i]
+            self.last_moves[i] = agent(observation, configuration) if callable(agent) else agent.play(observation, configuration)
+        
+        # Pick an agent.
+        if observation.step > 0:
+            # Select most successful agent.
+            best_agent_index = self.scores.index(max(self.scores))
+            next_move = self.last_moves[best_agent_index]
+        else:
+            # The first time just use the random agent.
+            next_move = self.last_moves[0]
+        
+        # Play.
+        return next_move
+
+# --- Final predictor function --- #
+
+my_agent = HybridAgent()
+def final_player(observation, configuration):
+    return my_agent.play(observation, configuration)
 
 # --- Local testing --- #
 
 '''
-class Observation:
-  def __init__(self, step, action):
-    self.step = step
-    self.lastOpponentAction = action
- 
-print(hybrid_agent(Observation(0,0), 2))
-print(hybrid_agent(Observation(1,0), 2))
-print(hybrid_agent(Observation(2,0), 2))
-print(hybrid_agent(Observation(3,0), 2))
-print(hybrid_agent(Observation(4,0), 2))
-print(hybrid_agent(Observation(5,0), 2))
+print(final_player(Observation(0,0), None))
+print(final_player(Observation(1,0), None))
+print(final_player(Observation(2,0), None))
+print(final_player(Observation(3,0), None))
+print(final_player(Observation(4,0), None))
+print(final_player(Observation(5,0), None))
+print(final_player(Observation(5,0), None))
+print(final_player(Observation(5,0), None))
+print(final_player(Observation(5,0), None))
+print(final_player(Observation(5,0), None))
 '''

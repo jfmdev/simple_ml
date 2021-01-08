@@ -2,12 +2,12 @@
 
 This repository contains examples of Jupyter notebooks and Python files that uses Machine Learning techniques to build simple models or agents.
 
- * The `disaster` folder uses _natural language processing_ to predict if a Tweet is announcing an emergency.
- * The `houses` folder uses _linear regression_ and _ridge regression_ models to predict the sales prices of houses.
- * The `mushrooms` folder uses _descision tree_ and _random forest_ models to predict which mushrooms are edible and which are poisonous.
- * The `rock-paper-scissors` folder uses _reinforcement learning_ to implement a bot to play the Rock Paper Scissors game.
- * The `santa-tour` folder uses _linear programming_ to find the best way to schedule tours to a site with capacity constraints. 
- * The `titanic` folder uses _descision tree_ and _random forest_ models to predict which passengers survived the Titanic sink. 
+ * The notebook on `disaster` folder uses _natural language processing_ to predict if a Tweet is announcing an emergency.
+ * The notebook on `houses` folder uses _linear regression_ and _ridge regression_ models to predict the sales prices of houses.
+ * The notebook on `mushrooms` folder uses _descision tree_ and _random forest_ models to predict which mushrooms are edible and which are poisonous.
+ * The bot on `rock-paper-scissors` folder uses _reinforcement learning_ to play the Rock Paper Scissors game.
+ * The notebook on `santa-tour` folder uses _linear programming_ to find the best way to schedule tours to a site with capacity constraints. 
+ * The notebook on `titanic` folder uses _descision tree_ and _random forest_ models to predict which passengers survived the Titanic sink. 
 
 License
 -------
