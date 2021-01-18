@@ -2,6 +2,7 @@
 
 This repository contains examples of Jupyter notebooks and Python files that uses Machine Learning techniques to build simple models or agents.
 
+ * The bots on `candy-cane` folder uses _reinforcement learning_ to solve a variant of the "multi-armed bandit" problem.
  * The notebook on `disaster` folder uses _natural language processing_ to predict if a Tweet is announcing an emergency.
  * The notebook on `houses` folder uses _linear regression_ and _ridge regression_ models to predict the sales prices of houses.
  * The notebook on `mushrooms` folder uses _descision tree_ and _random forest_ models to predict which mushrooms are edible and which are poisonous.
@@ -14,6 +15,3 @@ License
 
 All the code in this repository is free software; you can redistribute it and/or modify it under the terms of the Mozilla Public License v2.0.  
 You should have received a copy of the MPL 2.0 along with this repository, otherwise you can obtain one at http://mozilla.org/MPL/2.0/.
-
-
-https://www.kaggle.com/c/nlp-getting-started/leaderboard
